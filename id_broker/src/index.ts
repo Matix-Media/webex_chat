@@ -108,9 +108,10 @@ app.post("/refresh", async (c) => {
 });
 
 const port = 3000;
-console.log(`Server is running on http://localhost:${port}`);
+console.log(`Server is running on http://0.0.0.0:${port}`);
 
 serve({
     fetch: app.fetch,
     port,
+    hostname: "0.0.0.0",
 });
