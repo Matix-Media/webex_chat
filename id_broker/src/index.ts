@@ -14,6 +14,10 @@ if (!CLIENT_ID || !CLIENT_SECRET || !SCOPES) {
     throw new Error("One of the following environment variables are missing: WEBEX_CLIENT_ID, WEBEX_CLIENT_SECRET, WEBEX_SCOPES");
 }
 
+app.get("/health", async (c) => {
+    return c.json({ status: "ok" });
+});
+
 app.get("/device/authorize", async (c) => {
     const res = await fetch("https://webexapis.com/v1/device/authorize", {
         method: "POST",
