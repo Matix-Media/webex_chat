@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:webex_chat/src/core/webex_sdk/auth/webex_auth.dart';
 import 'package:webex_chat/src/core/webex_sdk/webex_config.dart';
-import 'package:webex_chat/src/ui/screens/loading.dart';
+import 'package:webex_chat/src/ui/screens/loading_screen.dart';
 
 void main() {
   Logger.root.level = Level.ALL;

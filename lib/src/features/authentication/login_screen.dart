@@ -9,7 +9,7 @@ import 'package:webex_chat/src/core/webex_sdk/api_request_exception.dart';
 import 'package:webex_chat/src/core/webex_sdk/auth/webex_auth.dart';
 
 import '../../core/transitions.dart';
-import '../chat/chat_screen.dart';
+import '../../ui/screens/overview_screen.dart';
 import 'auth_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -45,7 +45,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               if (!mounted) return;
               Navigator.pushReplacement(
                 context,
-                fadeRoute(const ChatScreen()),
+                fadeRoute(const OverviewScreen()),
               );
             } catch (e) {
               if (e is! ApiRequestException) rethrow;

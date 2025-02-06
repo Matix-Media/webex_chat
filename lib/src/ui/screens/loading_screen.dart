@@ -4,7 +4,7 @@ import 'package:webex_chat/src/core/transitions.dart';
 import 'package:webex_chat/src/features/authentication/auth_providers.dart';
 
 import '../../features/authentication/login_screen.dart';
-import '../../features/chat/chat_screen.dart';
+import 'overview_screen.dart';
 
 class LoadingScreen extends ConsumerStatefulWidget {
   const LoadingScreen({super.key});
@@ -32,7 +32,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
         if (!mounted) return;
 
         // Navigate to chat screen
-        Navigator.pushReplacement(context, fadeRoute(const ChatScreen()));
+        Navigator.pushReplacement(context, fadeRoute(const OverviewScreen()));
       }
     });
   }
