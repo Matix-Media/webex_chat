@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part "team.g.dart";
@@ -19,6 +22,19 @@ class Team {
     required this.creatorId,
     required this.created,
   });
+
+  ColorScheme get colorScheme {
+    // Generate SHA-256 hash
+    var bytes = utf8.encode(id);
+    var digest = sha256.convert(bytes);
+    var hexColor = '#${digest.toString().substring(0, 6)}';
+
+    // Convert hex to Color
+    final color = Color(int.parse(hexColor.substring(1, 7), radix: 16));
+
+    // Generate ColorScheme
+    return ColorScheme.fromSeed(seedColor: color);
+  }
 
   /// Helper methods for genericArgumentFactories
   static Team fromJsonModel(Object? json) => Team.fromJson(json as Map<String, dynamic>);
