@@ -57,6 +57,7 @@ class _VerticalSplitViewState extends State<VerticalSplitView> {
               MouseRegion(
                 cursor: SystemMouseCursors.resizeColumn,
                 child: GestureDetector(
+                  excludeFromSemantics: true,
                   behavior: HitTestBehavior.translucent,
                   child: SizedBox(
                     width: _dividerWidth,
