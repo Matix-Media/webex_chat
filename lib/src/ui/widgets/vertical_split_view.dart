@@ -54,31 +54,34 @@ class _VerticalSplitViewState extends State<VerticalSplitView> {
                 width: _width1,
                 child: widget.left,
               ),
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                child: SizedBox(
-                  width: _dividerWidth,
-                  height: constraints.maxHeight,
-                  child: const RotationTransition(
-                    turns: AlwaysStoppedAnimation(0.25),
-                    child: Opacity(
-                      opacity: 0.1,
-                      child: Icon(Icons.drag_handle),
+              MouseRegion(
+                cursor: SystemMouseCursors.resizeColumn,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  child: SizedBox(
+                    width: _dividerWidth,
+                    height: constraints.maxHeight,
+                    child: const RotationTransition(
+                      turns: AlwaysStoppedAnimation(0.25),
+                      child: Opacity(
+                        opacity: 0.1,
+                        child: Icon(Icons.drag_handle),
+                      ),
                     ),
                   ),
+                  onPanUpdate: (DragUpdateDetails details) {
+                    setState(
+                      () {
+                        _ratio += details.delta.dx / _maxWidth!;
+                        if (_ratio > 1) {
+                          _ratio = 1;
+                        } else if (_ratio < 0.0) {
+                          _ratio = 0.0;
+                        }
+                      },
+                    );
+                  },
                 ),
-                onPanUpdate: (DragUpdateDetails details) {
-                  setState(
-                    () {
-                      _ratio += details.delta.dx / _maxWidth!;
-                      if (_ratio > 1) {
-                        _ratio = 1;
-                      } else if (_ratio < 0.0) {
-                        _ratio = 0.0;
-                      }
-                    },
-                  );
-                },
               ),
               SizedBox(
                 width: _width2,
