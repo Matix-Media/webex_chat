@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:webex_chat/src/core/webex_sdk/api_request_exception.dart';
+import 'package:webex_chat/src/core/webex_sdk/api_response.dart';
 import 'package:webex_chat/src/core/webex_sdk/auth/webex_identity.dart'; // For JSON handling
 
 class APIClient {
@@ -15,30 +16,28 @@ class APIClient {
         _client = http.Client(),
         _identity = identity;
 
-  Future<dynamic> get(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
     return await _makeRequest('get', path, headers: headers);
   }
 
-  Future<dynamic> post(
+  Future<ApiResponse> post(
     String path,
     dynamic body, {
     BodyType bodyType = BodyType.json,
     Map<String, String>? headers,
   }) async {
-    return await _makeRequest('post', path,
-        body: body, bodyType: bodyType, headers: headers);
+    return await _makeRequest('post', path, body: body, bodyType: bodyType, headers: headers);
   }
 
-  Future<dynamic> put(String path, dynamic body,
-      {Map<String, String>? headers}) async {
+  Future<ApiResponse> put(String path, dynamic body, {Map<String, String>? headers}) async {
     return await _makeRequest('put', path, body: body, headers: headers);
   }
 
-  Future<dynamic> delete(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
     return await _makeRequest('delete', path, headers: headers);
   }
 
-  Future<dynamic> _makeRequest(
+  Future<ApiResponse> _makeRequest(
     String method,
     String path, {
     dynamic body,
@@ -65,8 +64,7 @@ class APIClient {
     }
 
     if (_identity != null) {
-      allHeaders['Authorization'] =
-          'Bearer ${await _identity.getValidAccessToken()}';
+      allHeaders['Authorization'] = 'Bearer ${await _identity.getValidAccessToken()}';
     }
 
     http.Response response;
@@ -89,12 +87,7 @@ class APIClient {
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       // Successful response
-      final contentType = response.headers['content-type'];
-      if (contentType != null && contentType.contains('application/json')) {
-        return jsonDecode(response.body); // Parse JSON
-      } else {
-        return response.body; // Return raw body (e.g., for text responses)
-      }
+      return ApiResponse(response);
     } else {
       // Handle error responses
       throw ApiRequestException(

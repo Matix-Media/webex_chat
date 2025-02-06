@@ -11,9 +11,9 @@ class IDBrokerAPI {
 
   Future<DeviceCodeResponse> getDeviceCode() async {
     try {
-      final jsonData = await _apiClient.get('/device/authorize');
-      if (jsonData != null && jsonData is Map<String, dynamic>) {
-        return DeviceCodeResponse.fromJson(jsonData);
+      final response = await _apiClient.get('/device/authorize');
+      if (response.body != null && response.body is Map<String, dynamic>) {
+        return DeviceCodeResponse.fromJson(response.body);
       } else {
         throw Exception('Invalid JSON response for device code');
       }
@@ -25,14 +25,14 @@ class IDBrokerAPI {
 
   Future<TokenResponse> getDeviceToken({required String deviceCode}) async {
     try {
-      final jsonData = await _apiClient.post(
+      final response = await _apiClient.post(
         '/device/token',
         {
           'deviceCode': deviceCode,
         },
       );
-      if (jsonData != null && jsonData is Map<String, dynamic>) {
-        return TokenResponse.fromJson(jsonData);
+      if (response.body != null && response.body is Map<String, dynamic>) {
+        return TokenResponse.fromJson(response.body);
       } else {
         throw Exception('Invalid JSON response for device token');
       }
@@ -48,14 +48,14 @@ class IDBrokerAPI {
     required String refreshToken,
   }) async {
     try {
-      final jsonData = await _apiClient.post(
+      final response = await _apiClient.post(
         '/refresh',
         {
           'refreshToken': refreshToken,
         },
       );
-      if (jsonData != null && jsonData is Map<String, dynamic>) {
-        return TokenResponse.fromJson(jsonData);
+      if (response.body != null && response.body is Map<String, dynamic>) {
+        return TokenResponse.fromJson(response.body);
       } else {
         throw Exception('Invalid JSON response for device token');
       }
