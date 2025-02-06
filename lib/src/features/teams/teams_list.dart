@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webex_chat/src/core/models/team.dart';
 import 'package:webex_chat/src/features/teams/teams_providers.dart';
 
 class TeamsList extends ConsumerWidget {
-  const TeamsList({super.key});
+  final Function(Team) _onTeamSelected;
+
+  const TeamsList({super.key, required Function(Team team) onTeamSelected}) : _onTeamSelected = onTeamSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,7 +19,14 @@ class TeamsList extends ConsumerWidget {
         itemBuilder: (context, index) {
           if (index < items.length) {
             final item = items[index];
-            return ListTile(title: Text(item.name));
+            return ListTile(
+              leading: Icon(Icons.groups, color: item.colorScheme.primary),
+              title: Text(
+                item.name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              onTap: () => _onTeamSelected(item),
+            );
           } else if (teamsAsyncNotifier.hasMore) {
             teamsAsyncNotifier.loadMore();
             return const Center(child: CircularProgressIndicator());
