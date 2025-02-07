@@ -1,6 +1,7 @@
 import 'package:logging/logging.dart';
 import 'package:webex_chat/src/core/webex_sdk/models/paginated_response.dart';
 import 'dart:convert';
+import '../models/room.dart';
 import '../models/team.dart';
 import 'auth/device_code_response.dart';
 import 'auth/openid_configuration.dart';
@@ -121,6 +122,23 @@ class WebexAPI {
       }
     } catch (e) {
       _logger.severe('Error fetching teams: $e');
+      rethrow;
+    }
+  }
+
+  Future<PaginatedResponse<Room>> getRooms({String? teamId, bool orgPublicSpaces = false, String? cursor}) async {
+    try {
+      final params = <String, String>{"orgPublicSpaces": orgPublicSpaces ? "true" : "false"};
+      if (teamId != null) params["teamId"] = teamId;
+      if (cursor != null) params["cursor"] = cursor;
+      final response = await _apiClientWithIdentity.get('/rooms', params: params);
+      if (response.body != null && response.body is Map<String, dynamic>) {
+        return PaginatedResponse.fromResponse(response, Room.fromJsonModel, "after");
+      } else {
+        throw Exception('Invalid JSON response for rooms');
+      }
+    } catch (e) {
+      _logger.severe('Error fetching rooms: $e');
       rethrow;
     }
   }

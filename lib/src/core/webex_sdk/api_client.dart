@@ -16,8 +16,8 @@ class APIClient {
         _client = http.Client(),
         _identity = identity;
 
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
-    return await _makeRequest('get', path, headers: headers);
+  Future<ApiResponse> get(String path, {Map<String, String>? headers, Map<String, String>? params}) async {
+    return await _makeRequest('get', path, headers: headers, params: params);
   }
 
   Future<ApiResponse> post(
@@ -25,16 +25,22 @@ class APIClient {
     dynamic body, {
     BodyType bodyType = BodyType.json,
     Map<String, String>? headers,
+    Map<String, String>? params,
   }) async {
-    return await _makeRequest('post', path, body: body, bodyType: bodyType, headers: headers);
+    return await _makeRequest('post', path, body: body, bodyType: bodyType, headers: headers, params: params);
   }
 
-  Future<ApiResponse> put(String path, dynamic body, {Map<String, String>? headers}) async {
-    return await _makeRequest('put', path, body: body, headers: headers);
+  Future<ApiResponse> put(
+    String path,
+    dynamic body, {
+    Map<String, String>? headers,
+    Map<String, String>? params,
+  }) async {
+    return await _makeRequest('put', path, body: body, headers: headers, params: params);
   }
 
-  Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
-    return await _makeRequest('delete', path, headers: headers);
+  Future<ApiResponse> delete(String path, {Map<String, String>? headers, Map<String, String>? params}) async {
+    return await _makeRequest('delete', path, headers: headers, params: params);
   }
 
   Future<ApiResponse> _makeRequest(
@@ -43,9 +49,17 @@ class APIClient {
     dynamic body,
     BodyType bodyType = BodyType.json,
     Map<String, String>? headers,
+    Map<String, String>? params,
   }) async {
-    final Uri uri = Uri.parse('$_baseUrl$path');
+    Uri uri = Uri.parse('$_baseUrl$path');
+
+    final Map<String, String> allParams = params ?? {};
     final Map<String, String> allHeaders = headers ?? {};
+
+    // Add query parameters
+    if (allParams.isNotEmpty) {
+      uri = uri.replace(queryParameters: {...uri.queryParameters, ...allParams});
+    }
 
     // Prepare the body
     dynamic bodyData;

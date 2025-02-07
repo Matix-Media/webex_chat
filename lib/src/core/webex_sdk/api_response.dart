@@ -12,7 +12,7 @@ class ApiResponse {
     statusCode = response.statusCode;
     final contentType = response.headers['content-type'];
     if (contentType != null && contentType.contains('application/json')) {
-      body = jsonDecode(response.body); // Parse JSON
+      body = jsonDecode(utf8.decode(response.bodyBytes)); // Parse JSON
     } else {
       body = response.body; // Return raw body (e.g., for text responses)
     }
