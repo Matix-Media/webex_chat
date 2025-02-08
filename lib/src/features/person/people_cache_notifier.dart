@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webex_chat/src/core/extensions/list_extensions.dart';
 import 'package:webex_chat/src/core/models/person.dart';
 import 'package:webex_chat/src/core/webex_sdk/webex_api.dart';
 
@@ -12,7 +13,8 @@ class PeopleCacheNotifier extends StateNotifier<Map<String, AsyncValue<Person>>>
   Future<void> fetchAndCachePeople(List<String> peopleIds) async {
     final peopleToFetch = peopleIds.where((id) => !state.containsKey(id));
     if (peopleToFetch.isEmpty) return;
-    await _fetchPeople(peopleIds);
+    final peopleToFetchChunked = peopleToFetch.toList().chunk(WebexAPI.maxPeoplePerRequest);
+    await Future.wait(peopleToFetchChunked.map((chunk) => _fetchPeople(chunk)));
   }
 
   Future<void> _fetchPeople(List<String> peopleIds) async {

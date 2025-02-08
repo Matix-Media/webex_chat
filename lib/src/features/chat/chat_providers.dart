@@ -12,7 +12,7 @@ final paginatedMessagesProvider =
   final fetchPeople = ref.watch(peopleCacheProvider.notifier).fetchAndCachePeople;
   return PaginatedItemsNotifier(({String? cursor}) async {
     final messages = await getMessages(roomId: room.id, cursor: cursor);
-    fetchPeople(messages.items.map((message) => message.personId).toList());
+    await fetchPeople(messages.items.map((message) => message.personId).toList());
     return messages;
   });
 });

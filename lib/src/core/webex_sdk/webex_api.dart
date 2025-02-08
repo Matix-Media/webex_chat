@@ -13,6 +13,8 @@ import 'auth/webex_identity.dart';
 import 'webex_config.dart';
 
 class WebexAPI {
+  static const maxPeoplePerRequest = 85;
+
   final Logger _logger = Logger('WebexAPI');
   final APIClient _apiClient = APIClient(baseUrl: WebexConfig.webexApiBaseUrl);
   late final APIClient _apiClientWithIdentity;
@@ -163,7 +165,7 @@ class WebexAPI {
 
   Future<PaginatedResponse<Person>> getPeople({required List<String> peopleIds}) async {
     try {
-      assert(peopleIds.length <= 85);
+      assert(peopleIds.length <= maxPeoplePerRequest);
       final response = await _apiClientWithIdentity.get("/people", params: {"id": peopleIds.join(",")});
       if (response.body != null && response.body is Map<String, dynamic>) {
         return PaginatedResponse.fromResponse(response, Person.fromJsonModel, "after");
