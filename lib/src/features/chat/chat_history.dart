@@ -21,7 +21,7 @@ class ChatHistory extends ConsumerWidget {
   Message? _getPreviousMessage(List<Message> messages, int index) {
     while (true) {
       index++;
-      if (index > messages.length) return null;
+      if (index >= messages.length) return null;
       final message = messages[index];
       if (message.parentId == null) return message;
     }
