@@ -11,6 +11,7 @@ import 'package:webex_chat/src/features/person/person_provider.dart';
 
 import '../../core/models/person.dart';
 import 'chat_message.dart';
+import 'chat_message_flow.dart';
 import 'chat_time_seperator.dart';
 
 class ChatHistory extends ConsumerWidget {
@@ -18,22 +19,8 @@ class ChatHistory extends ConsumerWidget {
 
   const ChatHistory({required Room room, super.key}) : _room = room;
 
-  Message? _getPreviousMessage(List<Message> messages, int index) {
-    while (true) {
-      index++;
-      if (index >= messages.length) return null;
-      final message = messages[index];
-      if (message.parentId == null) return message;
-    }
-  }
-
-  Message? _getNextMessage(List<Message> messages, int index) {
-    while (true) {
-      index--;
-      if (index < 0) return null;
-      final message = messages[index];
-      if (message.parentId == null) return message;
-    }
+  List<Message> _getThreadForMessage(List<Message> messages, Message message) {
+    return messages.where((m) => m.parentId == message.id).toList();
   }
 
   @override
@@ -56,74 +43,19 @@ class ChatHistory extends ConsumerWidget {
                 return const SizedBox.shrink();
               }
 
-              MessageStackPosition stackPosition = MessageStackPosition.bottom;
-              final previousMessage = _getPreviousMessage(items, index);
-              final nextMessage = _getNextMessage(items, index);
+              final previousMessage = ChatMessageFlow.getPreviousMessage(items, index);
+              final nextMessage = ChatMessageFlow.getNextMessage(items, index);
+              final threadMessages = _getThreadForMessage(items, item);
+              final isPreviousMessageAThread =
+                  previousMessage != null ? items.any((m) => m.parentId == previousMessage.id) : false;
 
-              final isNewDayToPreviousMessage =
-                  previousMessage == null || !previousMessage.created.isSameDayAs(item.created);
-              final isNewDayToNextMessage = nextMessage == null || !nextMessage.created.isSameDayAs(item.created);
-              final isNewAuthorToPreviousMessage = previousMessage == null || previousMessage.personId != item.personId;
-              final isNewAuthorToNextMessage = nextMessage == null || nextMessage.personId != item.personId;
-              final isTimeGapToPreviousMessage =
-                  previousMessage != null && item.created.difference(previousMessage.created).inMinutes > 5;
-              final isTimeGapToNextMessage =
-                  nextMessage == null || nextMessage.created.difference(item.created).inMinutes > 5;
-
-              bool isDetachedFromPreviousMessage = false;
-              bool isDetachedFromNextMessage = true;
-              if (previousMessage != null) {
-                if (!isNewDayToPreviousMessage && !isNewAuthorToPreviousMessage && isTimeGapToPreviousMessage) {
-                  isDetachedFromPreviousMessage = true;
-                }
-              }
-              if (nextMessage != null) {
-                if (!isNewDayToNextMessage && !isNewAuthorToNextMessage && !isTimeGapToNextMessage) {
-                  isDetachedFromNextMessage = false;
-                }
-              }
-
-              if (isDetachedFromPreviousMessage) {
-                if (isDetachedFromNextMessage) {
-                  stackPosition = MessageStackPosition.single;
-                } else {
-                  stackPosition = MessageStackPosition.top;
-                }
-              } else if (isDetachedFromNextMessage) {
-                stackPosition = MessageStackPosition.bottom;
-              }
-
-              final widgets = <Widget>[];
-
-              if (isNewDayToPreviousMessage) widgets.add(ChatTimeSeparator(dateTime: item.created));
-              if (isNewDayToPreviousMessage || isNewAuthorToPreviousMessage) {
-                widgets.add(
-                  Skeletonizer(
-                    enabled: !ref.watch(personProvider(item.personId)).hasValue,
-                    child: PersonMessageAnnotation(
-                      person: ref.watch(personProvider(item.personId)).hasValue
-                          ? ref.watch(personProvider(item.personId)).value!
-                          : Person.placeholder(),
-                    ),
-                  ),
-                );
-              }
-
-              widgets.add(
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: ChatMessage(
-                    message: item,
-                    stackPosition: stackPosition,
-                    isShowingTime: true,
-                  ),
-                ),
+              return ChatMessageFlow(
+                message: item,
+                previousMessage: previousMessage,
+                nextMessage: nextMessage,
+                threadMessages: threadMessages,
+                isPreviousMessageAThread: isPreviousMessageAThread,
               );
-
-              if (isDetachedFromNextMessage) widgets.add(const SizedBox(height: 8));
-
-              if (widgets.length > 1) return Column(children: widgets);
-              return widgets.first;
             } else if (messagesAsyncNotifier.hasMore) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 messagesAsyncNotifier.loadMore();

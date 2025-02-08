@@ -48,6 +48,7 @@ dependencies:
   scroll_animator: ^0.3.0
   skeletonizer: ^1.4.3
   intl: ^0.20.2
+  copy_with_extension_gen: ^6.0.1
 
 dev_dependencies:
   flutter_test:
