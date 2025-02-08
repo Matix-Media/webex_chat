@@ -47,22 +47,17 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> with TickerProv
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Card.filled(
-                      color: _selectedTeam != null
-                          ? _selectedTeam!.colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceBright,
+                      color: Theme.of(context).colorScheme.surfaceBright,
                       clipBehavior: Clip.antiAlias,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: _selectedTeam != null
-                            ? TeamTitleBar(
-                                team: _selectedTeam!,
-                                onBackPressed: () {
-                                  _selectedTeamAnimationController.reverse();
-                                  setState(() => _isShowingTeamRooms = false);
-                                },
-                              )
-                            : const SizedBox.shrink(),
-                      ),
+                      child: _selectedTeam != null
+                          ? TeamTitleBar(
+                              team: _selectedTeam!,
+                              onBackPressed: () {
+                                _selectedTeamAnimationController.reverse();
+                                setState(() => _isShowingTeamRooms = false);
+                              },
+                            )
+                          : const SizedBox.shrink(),
                     ),
                     const SizedBox(height: 8),
                   ],

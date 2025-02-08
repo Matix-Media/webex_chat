@@ -13,10 +13,12 @@ class TeamTitleBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        Container(
+          height: 56,
+          width: 12,
+          color: _team.colorScheme.primary,
+        ),
         IconButton(
-          style: IconButton.styleFrom(
-            foregroundColor: _team.colorScheme.onPrimary,
-          ),
           onPressed: () {
             _onBackPressed();
           },
@@ -25,10 +27,7 @@ class TeamTitleBar extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           _team.name,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                fontSize: 18,
-                color: _team.colorScheme.onPrimary,
-              ),
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 18),
         ),
       ],
     );
