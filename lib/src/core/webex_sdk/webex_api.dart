@@ -1,6 +1,8 @@
 import 'package:logging/logging.dart';
+import 'package:webex_chat/src/core/models/person.dart';
 import 'package:webex_chat/src/core/webex_sdk/models/paginated_response.dart';
 import 'dart:convert';
+import '../models/message.dart';
 import '../models/room.dart';
 import '../models/team.dart';
 import 'auth/device_code_response.dart';
@@ -32,8 +34,8 @@ class WebexAPI {
       } else {
         throw Exception('Invalid JSON response for openid configuration');
       }
-    } catch (e) {
-      _logger.severe('Error fetching openid configuration: $e');
+    } catch (e, s) {
+      _logger.severe('Error fetching openid configuration: $e', e, s);
       rethrow;
     }
   }
@@ -53,8 +55,8 @@ class WebexAPI {
       } else {
         throw Exception('Invalid JSON response for device code');
       }
-    } catch (e) {
-      _logger.severe('Error fetching device code: $e');
+    } catch (e, s) {
+      _logger.severe('Error fetching device code: $e', e, s);
       rethrow;
     }
   }
@@ -79,8 +81,8 @@ class WebexAPI {
       } else {
         throw Exception('Invalid JSON response for device token');
       }
-    } catch (e) {
-      _logger.severe('Error fetching device token: $e');
+    } catch (e, s) {
+      _logger.severe('Error fetching device token: $e', e, s);
       rethrow;
     }
   }
@@ -106,8 +108,8 @@ class WebexAPI {
       } else {
         throw Exception('Invalid JSON response for device token');
       }
-    } catch (e) {
-      _logger.severe('Error fetching device token: $e');
+    } catch (e, s) {
+      _logger.severe('Error fetching device token: $e', e, s);
       rethrow;
     }
   }
@@ -120,8 +122,8 @@ class WebexAPI {
       } else {
         throw Exception('Invalid JSON response for teams');
       }
-    } catch (e) {
-      _logger.severe('Error fetching teams: $e');
+    } catch (e, s) {
+      _logger.severe('Error fetching teams: $e', e, s);
       rethrow;
     }
   }
@@ -137,8 +139,39 @@ class WebexAPI {
       } else {
         throw Exception('Invalid JSON response for rooms');
       }
-    } catch (e) {
-      _logger.severe('Error fetching rooms: $e');
+    } catch (e, s) {
+      _logger.severe('Error fetching rooms: $e', e, s);
+      rethrow;
+    }
+  }
+
+  Future<PaginatedResponse<Message>> getMessages({required String roomId, String? cursor}) async {
+    try {
+      final params = <String, String>{'roomId': roomId};
+      if (cursor != null) params['beforeMessage'] = cursor;
+      final response = await _apiClientWithIdentity.get("/messages", params: params);
+      if (response.body != null && response.body is Map<String, dynamic>) {
+        return PaginatedResponse.fromResponse(response, Message.fromJsonModel, "beforeMessage");
+      } else {
+        throw Exception('Invalid JSON response for messages');
+      }
+    } catch (e, s) {
+      _logger.severe('Error fetching messages: $e', e, s);
+      rethrow;
+    }
+  }
+
+  Future<PaginatedResponse<Person>> getPeople({required List<String> peopleIds}) async {
+    try {
+      assert(peopleIds.length <= 85);
+      final response = await _apiClientWithIdentity.get("/people", params: {"id": peopleIds.join(",")});
+      if (response.body != null && response.body is Map<String, dynamic>) {
+        return PaginatedResponse.fromResponse(response, Person.fromJsonModel, "after");
+      } else {
+        throw Exception('Invalid JSON response for persons (webex-people-api)');
+      }
+    } catch (e, s) {
+      _logger.severe("Error fetching messages: $e", e, s);
       rethrow;
     }
   }

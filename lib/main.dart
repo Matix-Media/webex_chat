@@ -11,6 +11,9 @@ void main() {
     print(
       '${record.time} -- [${record.loggerName}] ${record.level.name}: ${record.message}',
     );
+    if (record.stackTrace != null) {
+      print(record.stackTrace);
+    }
   });
 
   runApp(ProviderScope(child: const WebexChatApp()));

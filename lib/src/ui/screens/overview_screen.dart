@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webex_chat/src/core/models/team.dart';
+import 'package:webex_chat/src/features/chat/chat_history.dart';
+import 'package:webex_chat/src/features/chat/chat_titlebar.dart';
 import 'package:webex_chat/src/features/teams/teams_list.dart';
 import 'package:webex_chat/src/ui/widgets/vertical_split_view.dart';
 
@@ -15,8 +17,9 @@ class OverviewScreen extends ConsumerStatefulWidget {
   ConsumerState<OverviewScreen> createState() => _OverviewScreenState();
 }
 
-class _OverviewScreenState extends ConsumerState<OverviewScreen> with SingleTickerProviderStateMixin {
+class _OverviewScreenState extends ConsumerState<OverviewScreen> with TickerProviderStateMixin {
   late final AnimationController _selectedTeamAnimationController;
+  late final AnimationController _selectedRoomAnimationController;
   Team? _selectedTeam;
   bool _isShowingTeamRooms = false;
   Room? _selectedRoom;
@@ -25,6 +28,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> with SingleTick
   void initState() {
     super.initState();
     _selectedTeamAnimationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _selectedRoomAnimationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   }
 
   @override
@@ -77,6 +81,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> with SingleTick
                               setState(() {
                                 _selectedRoom = room;
                               });
+                              _selectedRoomAnimationController.forward();
                             },
                           )
                         : TeamsList(
@@ -104,9 +109,43 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> with SingleTick
               ),
             ],
           ),
-          right: Card.filled(
-            color: Theme.of(context).colorScheme.surfaceBright,
-            child: SizedBox.expand(),
+          right: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizeTransition(
+                sizeFactor: CurvedAnimation(parent: _selectedRoomAnimationController, curve: Curves.decelerate),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Card.filled(
+                      color: Theme.of(context).colorScheme.surfaceBright,
+                      child: Padding(
+                        padding: EdgeInsets.all(14.5),
+                        child: _selectedRoom == null ? null : ChatTitleBar(room: _selectedRoom!),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Card.filled(
+                  color: Theme.of(context).colorScheme.surfaceBright,
+                  child: _selectedRoom == null
+                      ? const Center(child: Text("Select a room to chat."))
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: ChatHistory(room: _selectedRoom!),
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

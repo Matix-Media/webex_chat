@@ -28,7 +28,9 @@ class TeamsList extends ConsumerWidget {
               onTap: () => _onTeamSelected(item),
             );
           } else if (teamsAsyncNotifier.hasMore) {
-            teamsAsyncNotifier.loadMore();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              teamsAsyncNotifier.loadMore();
+            });
             return const Center(child: CircularProgressIndicator());
           } else {
             return const Center(child: Text("No more teams"));

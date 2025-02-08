@@ -36,7 +36,9 @@ class RoomsList extends ConsumerWidget {
                 onTap: () => _onRoomSelected(item),
               );
             } else if (roomsAsyncNotifier.hasMore) {
-              roomsAsyncNotifier.loadMore();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                roomsAsyncNotifier.loadMore();
+              });
               return const Center(child: CircularProgressIndicator());
             } else {
               return const Center(child: Text("No more rooms"));
