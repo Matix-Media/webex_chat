@@ -28,10 +28,13 @@ class RoomsList extends ConsumerWidget {
             if (index < items.length) {
               final item = items[index];
               return ListTile(
-                leading: Icon(Icons.forum),
+                leading: Icon(
+                  Icons.forum_outlined,
+                  size: 20,
+                ),
                 title: Text(
                   item.id == _team?.id ? "General" : item.title,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 onTap: () => _onRoomSelected(item),
               );
